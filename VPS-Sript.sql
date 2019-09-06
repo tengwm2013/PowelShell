@@ -1,0 +1,1 @@
+update  branch set ConnectionString = REPLACE(ConnectionString, "172.31.9.200", "172.31.9.9")  where branchcode='JRB'
