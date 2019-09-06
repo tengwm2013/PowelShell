@@ -1,0 +1,40 @@
+REM Network authenticat
+cmdkey /add:172.30.34.10\Admin /user:s /pass:s
+
+REM Delete historical file
+forfiles /M *.sql /D -90 /C "cmd /c del @file"
+
+REM Dump mySQL
+echo on
+set todayDate=%Date:~6,4%%Date:~3,2%%Date:~0,2%
+set BKFolder="C:\Administrative\Application\HQDatabaseBackup\TempBackup\FlatDatabases"
+set BK7zFile="C:\Administrative\Application\HQDatabaseBackup\TempBackup\FlatDatabases\FlatDatabases%todayDate%.7z"
+set BKFile="C:\Administrative\Application\HQDatabaseBackup\TempBackup\FlatDatabases\*.dump"
+REM set DestBkFolder="W:\FlatDatabases"
+set DestBkFolder="\\x.x.x.x\_Backup\DatabaseBackup\FlatDatabases"
+set ArchiveFolder= "W:\DatabaseBackup\FlatDatabases"
+if not exist %BKFolder% mkdir %BKFolder%
+C:
+cd "C:\Program Files\MySQL\MySQL Server 5.7\bin"
+mysqldump -hx.x.x.x -P330x -ux -px sourceDb --routines --events > %BKFolder%\destDB_%todayDate%.dump
+
+cd "C:\Program Files\7-Zip"
+7z a -t7z %BK7zFile% %BKFile%
+COPY %BK7zFile% %DestBkFolder%
+ 
+REM Delete file older that 60 days
+C:
+CD %BKFolder%
+DEL *.dump
+DEL *.7z
+
+REM CD FlatDatabases
+CD %ArchiveFolder%
+W:
+forfiles /M *.7z /D -60 /C "cmd /c del @file"
+
+CD C:\Administrative\Application\HQDatabaseBackup
+
+
+
+
